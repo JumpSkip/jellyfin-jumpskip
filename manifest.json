@@ -1,0 +1,21 @@
+[
+  {
+    "guid": "729820ed-19c7-48ce-aaca-42ffe3e9f4a1",
+    "name": "JumpSkip",
+    "description": "Detect and skip media segments (intros, recaps, outros/credits, and previews) using both chapter titles and crowdsourced timestamp data from TheIntroDB, IntroDB, and SkipDB.\n",
+    "overview": "Detect and skip media segments (intros, recaps, outros/credits, and previews) using both chapter titles and crowdsourced timestamp data from TheIntroDB, IntroDB, and SkipDB.\n",
+    "owner": "ElectricArdvark",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/JumpSkip/jellyfin-jumpskip/main/assets/icon.svg",
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "targetAbi": "12.4.0.0",
+        "timestamp": "2026-11-03T00:00:00Z",
+        "changelog": "Initial release\n.",
+        "sourceUrl": "https://github.com/JumpSkip/jellyfin-jumpskip/releases/download/v1.0.0.0/JumpSkip_1.0.0.0_jellyfin-12.4.zip",
+        "checksum": ""
+      }
+    ]
+  }
+]

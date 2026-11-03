@@ -1,0 +1,28 @@
+<Project>
+  <Target Name="CheckReleaseVersion" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(ReleaseVersion)' == ''" Text="meta.json must contain a version with four numeric parts." />
+    <Error Condition="'$(Version)' != '$(ReleaseVersion)' or '$(AssemblyVersion)' != '$(ReleaseVersion)' or '$(FileVersion)' != '$(ReleaseVersion)'"
+           Text="Version, AssemblyVersion and FileVersion must come from meta.json." />
+  </Target>
+
+  <UsingTask TaskName="WriteJumpSkipInstallMetadata" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <PluginAssembly ParameterType="System.String" Required="true" />
+      <MetadataFile ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        // Loading the bytes avoids locking the DLL across subsequent builds.
+        var assembly = System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(PluginAssembly));
+        var metadata = assembly.GetType("JumpSkip.PluginMetadata", true);
+        var json = (string)metadata.GetMethod("CreateInstallMetadata").Invoke(null, null);
+        System.IO.File.WriteAllText(MetadataFile, json);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="WriteInstallMetadata" AfterTargets="Build">
+    <WriteJumpSkipInstallMetadata PluginAssembly="$(TargetPath)" MetadataFile="$(TargetDir)meta.json" />
+  </Target>
+</Project>

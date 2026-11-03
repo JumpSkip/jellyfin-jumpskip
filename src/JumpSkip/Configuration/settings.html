@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>JumpSkip settings</title></head>
+<body>
+<div id="JumpSkipPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox,emby-select">
+<style>
+    #JumpSkipPage .js-content { max-width: 58rem; padding: 2rem; margin: 0 auto; }
+    #JumpSkipPage fieldset { border: 0; border-top: 1px solid #8885; padding: 1.25rem 0 0; margin: 2rem 0; min-width: 0; }
+    #JumpSkipPage legend { font-size: 1.25rem; font-weight: 600; padding-right: 1rem; }
+    #JumpSkipPage .js-field { margin: 0 0 1.5rem; }
+    #JumpSkipPage .fieldDescription { margin-top: .5rem; line-height: 1.5; }
+    #JumpSkipPage .js-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+    #JumpSkipPage .js-offsets > div { flex: 1; min-width: 8rem; }
+    #JumpSkipPage .js-offsets { max-width: 30rem; margin-top: 1rem; }
+    #JumpSkipPage .js-number { max-width: 12rem; }
+    #JumpSkipPage .js-priority { max-width: 38rem; }
+    #JumpSkipPage .js-priority-row { display: grid; grid-template-columns: 13rem 1.5rem minmax(0, 1fr); align-items: center; gap: .75rem; margin-top: 1rem; }
+    #JumpSkipPage .js-priority-row label { margin: 0; }
+    #JumpSkipPage .js-priority-arrow { text-align: center; opacity: .65; }
+    #JumpSkipPage .js-priority-control { position: relative; min-width: 0; margin: 0; }
+    #JumpSkipPage .js-priority-control select { width: 100%; box-sizing: border-box; }
+    #JumpSkipPage .js-priority-control > .selectLabel:empty { display: none; }
+    #JumpSkipPage .js-priority-control .selectArrowContainer { top: 50%; bottom: auto; transform: translateY(-50%); line-height: 1; }
+    #JumpSkipPage .js-priority-control .selectArrow { display: block; margin: 0; line-height: 1; }
+    #JumpSkipPage button { cursor: pointer; }
+    #JumpSkipPage button:disabled { cursor: default; opacity: .5; }
+    #JumpSkipPage [hidden] { display: none !important; }
+    #JumpSkipPage .js-selection { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+    #JumpSkipPage .js-chip { border: 1px solid #8886; border-radius: .4rem; padding: .4rem .7rem; background: transparent; color: inherit; font: inherit; text-align: left; }
+    #JumpSkipPage .js-dialog { box-sizing: border-box; width: min(58rem, 94vw); max-height: 88vh; padding: 1.5rem; border: 1px solid #8886; border-radius: .6rem; background: #202124; color: #eee; }
+    #JumpSkipPage .js-dialog::backdrop { background: #000a; }
+    #JumpSkipPage .js-dialog h2 { margin: 0 0 1rem; }
+    #JumpSkipPage .js-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: .8rem; margin: 1rem 0; }
+    #JumpSkipPage .js-card { display: flex; flex-direction: column; align-items: center; padding: .7rem; border: 1px solid #8885; border-radius: .4rem; background: #ffffff08; color: inherit; font: inherit; text-align: center; }
+    #JumpSkipPage .js-card[aria-pressed="true"] { border-color: #00a4dc; background: #00a4dc22; }
+    #JumpSkipPage .js-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: .25rem; margin-bottom: .5rem; }
+    #JumpSkipPage .js-card small { margin-top: .4rem; opacity: .75; }
+    #JumpSkipPage .js-picker-footer { justify-content: flex-end; border-top: 1px solid #8885; padding-top: 1rem; }
+    #JumpSkipPage #js-status { margin: 1rem 0; line-height: 1.5; }
+    @media (max-width: 40rem) {
+        #JumpSkipPage .js-content { padding: 1rem; }
+        #JumpSkipPage .js-dialog { padding: 1rem; }
+        #JumpSkipPage .js-priority-row { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+        #JumpSkipPage .js-priority-arrow { display: none; }
+    }
+</style>
+<div data-role="content" class="js-content content-primary">
+    <h1>JumpSkip</h1>
+    <form id="js-form">
+        <fieldset>
+            <legend>General</legend>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-enabled" type="checkbox" is="emby-checkbox" aria-describedby="js-enabled-help"><span>Enable JumpSkip</span></label>
+                <div id="js-enabled-help" class="fieldDescription">Turn off and save to remove JumpSkip segments and restore original chapters. Reopen playback to reload markers. Turn on and save to refresh them again.</div>
+            </div>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-chapters" type="checkbox" is="emby-checkbox" aria-describedby="js-chapters-help"><span>Mark Chapters</span></label>
+                <div id="js-chapters-help" class="fieldDescription">Add named chapters at segment boundaries for chapter navigation. Turning this off restores original chapters on the next refresh.</div>
+            </div>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-chapter-skip" type="checkbox" is="emby-checkbox" aria-describedby="js-chapter-skip-help"><span>Enable chapter-based skipping</span></label>
+                <div id="js-chapter-skip-help" class="fieldDescription">Use matching chapter names to fill gaps in provider segments. Each chapter ends at the next chapter or the video end. The segment toggles also apply.</div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Providers</legend>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-introdb" type="checkbox" is="emby-checkbox"><span>Enable IntroDB</span></label>
+            </div>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-theintrodb" type="checkbox" is="emby-checkbox"><span>Enable TheIntroDB</span></label>
+            </div>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-skipdb" type="checkbox" is="emby-checkbox"><span>Enable SkipDB</span></label>
+            </div>
+            <div class="js-field js-priority" role="group" aria-labelledby="js-priority-title">
+                <div id="js-priority-title" class="inputLabel">Provider Priority</div>
+                <div class="js-priority-row">
+                    <label class="inputLabel" for="js-priority-1">1st Priority (Highest)</label>
+                    <span class="js-priority-arrow" aria-hidden="true">→</span>
+                    <div class="js-priority-control selectContainer">
+                        <select id="js-priority-1" is="emby-select" required disabled aria-describedby="js-priority-help">
+                            <option value="" disabled selected>Select provider...</option>
+                            <option value="IntroDB">IntroDB</option>
+                            <option value="TheIntroDB">TheIntroDB</option>
+                            <option value="SkipDB">SkipDB</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="js-priority-row">
+                    <label class="inputLabel" for="js-priority-2">2nd Priority</label>
+                    <span class="js-priority-arrow" aria-hidden="true">→</span>
+                    <div class="js-priority-control selectContainer">
+                        <select id="js-priority-2" is="emby-select" required disabled aria-describedby="js-priority-help">
+                            <option value="" disabled selected>Select provider...</option>
+                            <option value="IntroDB">IntroDB</option>
+                            <option value="TheIntroDB">TheIntroDB</option>
+                            <option value="SkipDB">SkipDB</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="js-priority-row">
+                    <label class="inputLabel" for="js-priority-3">3rd Priority (Lowest)</label>
+                    <span class="js-priority-arrow" aria-hidden="true">→</span>
+                    <div class="js-priority-control selectContainer">
+                        <select id="js-priority-3" is="emby-select" required disabled aria-describedby="js-priority-help">
+                            <option value="" disabled selected>Select provider...</option>
+                            <option value="IntroDB">IntroDB</option>
+                            <option value="TheIntroDB">TheIntroDB</option>
+                            <option value="SkipDB">SkipDB</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="js-priority-help" class="fieldDescription">Choosing a provider already in another row swaps their positions. Disabled providers are skipped.</div>
+            </div>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-merge" type="checkbox" is="emby-checkbox" aria-describedby="js-merge-help"><span>Merge provider Segments</span></label>
+                <div id="js-merge-help" class="fieldDescription">Combine segments from enabled providers; priority resolves conflicting timestamps. When off, use the first provider with usable segments.</div>
+            </div>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-timeout">HTTP request timeout</label>
+                <input id="js-timeout" class="js-number" type="number" min="1" max="60" step="1" required is="emby-input" aria-describedby="js-timeout-help">
+                <div id="js-timeout-help" class="fieldDescription">Seconds to wait for a provider response before the request times out (1–60).</div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Segments</legend>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-intro" type="checkbox" is="emby-checkbox"><span>Intro</span></label>
+            </div>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-recap" type="checkbox" is="emby-checkbox"><span>Recap</span></label>
+            </div>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-outro" type="checkbox" is="emby-checkbox"><span>Outro/Credits</span></label>
+            </div>
+            <div class="js-field checkboxContainer">
+                <label class="emby-checkbox-label"><input id="js-preview" type="checkbox" is="emby-checkbox"><span>Preview/Post-Credits</span></label>
+            </div>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-offsets" type="checkbox" is="emby-checkbox" aria-describedby="js-offsets-help"><span>Timing offsets</span></label>
+                <div id="js-offsets-help" class="fieldDescription">Adjust segment boundaries in seconds. A negative start offset shows the skip prompt earlier; a positive one shows it later. The end offset adjusts where skipping lands.</div>
+                <div class="js-row js-offsets">
+                    <div><label class="inputLabel" for="js-start-offset">Start (seconds)</label><input id="js-start-offset" type="number" min="-3600" max="3600" step="any" required is="emby-input"></div>
+                    <div><label class="inputLabel" for="js-end-offset">End (seconds)</label><input id="js-end-offset" type="number" min="-3600" max="3600" step="any" required is="emby-input"></div>
+                </div>
+            </div>
+            <div class="js-field checkboxContainer checkboxContainer-withDescription">
+                <label class="emby-checkbox-label"><input id="js-fetch" type="checkbox" is="emby-checkbox" aria-describedby="js-fetch-help"><span>Fetch on playback and metadata changes</span></label>
+                <div id="js-fetch-help" class="fieldDescription">Automatically fetch segments when playback starts, metadata changes or new videos are added. Scheduled scans remain available when this is off.</div>
+            </div>
+            <div class="js-field">
+                <button id="js-remove" type="button" is="emby-button" class="raised" aria-describedby="js-remove-help" disabled>Remove Fetched Segments</button>
+                <div id="js-remove-help" class="fieldDescription">Remove all JumpSkip segments now and restore original chapters, including on blacklisted items. Other providers are preserved. Saving settings, later scans or automatic fetching can add segments again.</div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Chapter-based skipping</legend>
+            <h3>Keyword lists</h3>
+            <p class="fieldDescription">Comma-separated and case-insensitive. Keywords of 3 characters or fewer, such as op and ed, match whole words. Longer keywords match within a title. Leave a list empty to disable chapter matching for that category.</p>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-chapter-intro">Intro keywords</label>
+                <input id="js-chapter-intro" type="text" maxlength="4096" value="intro,introduction,opening,op,theme,title sequence" is="emby-input" data-chapter-option>
+            </div>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-chapter-outro">Outro/Credits keywords</label>
+                <input id="js-chapter-outro" type="text" maxlength="4096" value="ed,ending,outro,credits,end credits,closing" is="emby-input" data-chapter-option>
+            </div>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-chapter-recap">Recap keywords</label>
+                <input id="js-chapter-recap" type="text" maxlength="4096" value="recap,previously" is="emby-input" data-chapter-option>
+            </div>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-chapter-preview">Preview keywords</label>
+                <input id="js-chapter-preview" type="text" maxlength="4096" value="preview,next episode" is="emby-input" data-chapter-option>
+            </div>
+            <h3>Sanity bounds</h3>
+            <p class="fieldDescription">Ignore chapters outside these duration limits. Any uncovered pieces must also fit the limits.</p>
+            <div class="js-field js-row js-offsets">
+                <div><label class="inputLabel" for="js-chapter-min">Minimum duration (seconds)</label><input id="js-chapter-min" type="number" min="0.1" max="86400" step="any" value="10" required is="emby-input" data-chapter-option></div>
+                <div><label class="inputLabel" for="js-chapter-max">Maximum duration (seconds)</label><input id="js-chapter-max" type="number" min="0.1" max="86400" step="any" value="600" required is="emby-input" data-chapter-option></div>
+            </div>
+            <div class="js-field inputContainer">
+                <label class="inputLabel" for="js-chapter-overlap">Overlap threshold</label>
+                <input id="js-chapter-overlap" class="js-number" type="number" min="0" max="1" step="any" value="0.5" required is="emby-input" data-chapter-option aria-describedby="js-chapter-overlap-help">
+                <div id="js-chapter-overlap-help" class="fieldDescription">Discard a matching chapter when providers cover this fraction or more (0–1). At 0, any overlap is rejected. Smaller overlaps are trimmed; provider timestamps always win.</div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Scan Directory</legend>
+            <div class="js-field">
+                <h3>Blacklist</h3>
+                <div class="fieldDescription">Skip the selected libraries, shows or movies. Saving removes their existing JumpSkip segments and restores original chapters. All other supported videos are scanned.</div>
+                <div id="js-blacklist-summary" class="js-selection" aria-live="polite"></div>
+                <div class="js-row">
+                    <button id="js-blacklist-browse" type="button" is="emby-button" class="raised">Browse libraries and shows</button>
+                    <button id="js-blacklist-clear" type="button" is="emby-button" class="raised">Clear selection</button>
+                </div>
+            </div>
+        </fieldset>
+        <button id="js-save" type="submit" is="emby-button" class="raised button-submit block" disabled>Save Settings</button>
+    </form>
+    <p id="js-status" role="status" aria-live="polite"></p>
+</div>
+<dialog id="js-picker" class="js-dialog" aria-labelledby="js-picker-title">
+    <h2 id="js-picker-title">Choose libraries</h2>
+    <div class="js-row">
+        <button id="js-picker-back" type="button" is="emby-button" class="raised" hidden>Back to libraries</button>
+        <button id="js-picker-library" type="button" is="emby-button" class="raised" hidden></button>
+    </div>
+    <div class="inputContainer">
+        <label id="js-picker-search-label" class="inputLabel" for="js-picker-search">Search libraries</label>
+        <input id="js-picker-search" type="search" is="emby-input" autocomplete="off">
+    </div>
+    <p id="js-picker-status" class="fieldDescription" role="status"></p>
+    <div id="js-picker-results" class="js-picker-grid"></div>
+    <button id="js-picker-more" type="button" is="emby-button" class="raised" hidden>Load more</button>
+    <div class="js-row js-picker-footer">
+        <button id="js-picker-cancel" type="button" is="emby-button" class="raised">Cancel</button>
+        <button id="js-picker-apply" type="button" is="emby-button" class="raised button-submit">Apply selection</button>
+    </div>
+</dialog>
+<script>
+(function () {
+    'use strict';
+    const page = document.querySelector('#JumpSkipPage');
+    const $ = id => page.querySelector('#' + id);
+    const fields = [
+        ['Enabled', 'js-enabled'], ['InjectChapters', 'js-chapters'],
+        ['IntroDb.Enabled', 'js-introdb'], ['TheIntroDb.Enabled', 'js-theintrodb'],
+        ['SkipDb.Enabled', 'js-skipdb'],
+        ['MergeProviderSegments', 'js-merge'], ['RequestTimeoutSeconds', 'js-timeout'],
+        ['EnableIntro', 'js-intro'], ['EnableRecap', 'js-recap'],
+        ['EnableOutro', 'js-outro'], ['EnablePreview', 'js-preview'],
+        ['EnableTimingOffsets', 'js-offsets'], ['StartOffsetSeconds', 'js-start-offset'],
+        ['EndOffsetSeconds', 'js-end-offset'], ['EnableOnDemandFetch', 'js-fetch'],
+        ['EnableChapterSkipping', 'js-chapter-skip'], ['ChapterIntroKeywords', 'js-chapter-intro'],
+        ['ChapterOutroKeywords', 'js-chapter-outro'], ['ChapterRecapKeywords', 'js-chapter-recap'],
+        ['ChapterPreviewKeywords', 'js-chapter-preview'], ['ChapterMinDurationSeconds', 'js-chapter-min'],
+        ['ChapterMaxDurationSeconds', 'js-chapter-max'], ['ChapterOverlapThreshold', 'js-chapter-overlap']
+    ];
+    const scopePaths = {
+        blacklist: ['ExcludedLibraryIds', 'ExcludedItemIds']
+    };
+    const scopes = {};
+    const known = new Map();
+    const normalize = id => id.replaceAll('-', '').toLowerCase();
+    const includes = (ids, id) => ids.some(value => normalize(value) === normalize(id));
+    const read = (obj, path) => path.split('.').reduce((value, key) => value?.[key], obj);
+    function write(obj, path, value) {
+        const keys = path.split('.');
+        const parent = keys.slice(0, -1).reduce((value, key) => value[key], obj);
+        parent[keys[keys.length - 1]] = value;
+    }
+    function api(method, path, data) {
+        const options = { type: method, url: ApiClient.getUrl(path), dataType: 'json' };
+        if (data !== undefined) { options.contentType = 'application/json'; options.data = JSON.stringify(data); }
+        return ApiClient.ajax(options);
+    }
+    const get = (path, query) => ApiClient.getJSON(ApiClient.getUrl(path, query));
+    const userPath = () => 'Users/' + ApiClient.getCurrentUserId();
+    const errorText = error => error?.responseJSON?.Error || error?.message || 'Request failed. Check the server log.';
+    const status = text => { $('js-status').textContent = text; };
+    const remember = items => { for (const item of items) known.set(normalize(item.Id), item); };
+    const itemName = id => known.get(normalize(id))?.Name || 'Unavailable item (' + id + ')';
+    let loaded = false, saving = false, loadVersion = 0;
+    let picker = null, libraries = [], browseItems = [], browseTotal = 0, browseOffset = 0;
+    let searchTimer, browseVersion = 0;
+    const prioritySelects = [1, 2, 3].map(rank => $('js-priority-' + rank));
+    let priorityOrder = [];
+    function renderPriority() {
+        prioritySelects.forEach((select, index) => { select.value = priorityOrder[index]; });
+    }
+    prioritySelects.forEach((select, index) => {
+        select.onchange = () => {
+            if (!loaded || saving) return;
+            const previousIndex = priorityOrder.indexOf(select.value);
+            if (previousIndex >= 0) {
+                [priorityOrder[index], priorityOrder[previousIndex]] = [priorityOrder[previousIndex], priorityOrder[index]];
+            }
+            renderPriority();
+        };
+    });
+
+    function offsetsState() {
+        $('js-start-offset').disabled = !$('js-offsets').checked;
+        $('js-end-offset').disabled = !$('js-offsets').checked;
+    }
+    $('js-offsets').onchange = offsetsState;
+
+    function chapterSettingsState() {
+        for (const input of page.querySelectorAll('[data-chapter-option]')) input.disabled = !$('js-chapter-skip').checked;
+        $('js-chapter-max').min = $('js-chapter-min').value || '0.1';
+    }
+    $('js-chapter-skip').onchange = chapterSettingsState;
+    $('js-chapter-min').oninput = chapterSettingsState;
+
+    function renderSummary(mode) {
+        const target = $('js-' + mode + '-summary');
+        target.replaceChildren();
+        const scope = scopes[mode];
+        if (!scope) return;
+        for (const kind of ['libraries', 'items']) {
+            for (const id of scope[kind]) {
+                const button = document.createElement('button');
+                button.type = 'button'; button.className = 'js-chip';
+                button.textContent = itemName(id) + ' ×';
+                button.setAttribute('aria-label', 'Remove ' + itemName(id) + ' from ' + mode);
+                button.onclick = () => {
+                    if (saving) return;
+                    scope[kind] = scope[kind].filter(value => normalize(value) !== normalize(id));
+                    renderSummary(mode);
+                };
+                target.append(button);
+            }
+        }
+        if (!target.childElementCount) target.textContent = 'Nothing excluded';
+    }
+
+    async function loadSettings() {
+        const version = ++loadVersion;
+        loaded = false; $('js-save').disabled = true; $('js-remove').disabled = true;
+        prioritySelects.forEach(select => { select.disabled = true; });
+        status('Loading settings…');
+        try {
+            const config = await api('GET', 'JumpSkip/Settings');
+            if (version !== loadVersion) return;
+            for (const [path, id] of fields) {
+                const input = $(id), value = read(config, path);
+                if (input.type === 'checkbox') input.checked = value ?? (path === 'MergeProviderSegments' || path === 'EnableChapterSkipping');
+                else input.value = value ?? (input.defaultValue || (input.type === 'number' ? 0 : ''));
+            }
+            priorityOrder = [...config.ProviderPriority];
+            renderPriority();
+            prioritySelects.forEach(select => { select.disabled = false; });
+            for (const [mode, paths] of Object.entries(scopePaths)) {
+                scopes[mode] = { libraries: [...(config[paths[0]] || [])], items: [...(config[paths[1]] || [])] };
+                renderSummary(mode);
+            }
+            offsetsState(); chapterSettingsState(); loaded = true; $('js-save').disabled = false; $('js-remove').disabled = false;
+            status('Settings loaded');
+            const ids = [...new Set(Object.values(scopes).flatMap(scope => [...scope.libraries, ...scope.items]))];
+            for (let offset = 0; offset < ids.length; offset += 100) {
+                const result = await get(userPath() + '/Items', { Ids: ids.slice(offset, offset + 100).join(','), Recursive: true, Limit: 100 });
+                if (version !== loadVersion) return;
+                remember(result.Items || []);
+            }
+            for (const mode of Object.keys(scopePaths)) renderSummary(mode);
+        } catch (error) {
+            if (version === loadVersion) status(loaded ? 'Settings loaded. Some selection names could not be loaded.' : errorText(error));
+        }
+    }
+    page.addEventListener('pageshow', () => { if (!saving) void loadSettings(); });
+    page.addEventListener('pagehide', () => { ++loadVersion; closePicker(); });
+
+    function setBusy(busy) {
+        saving = busy;
+        $('js-save').disabled = busy;
+        $('js-remove').disabled = busy;
+        for (const section of $('js-form').querySelectorAll('fieldset')) section.disabled = busy;
+    }
+
+    $('js-form').onsubmit = async event => {
+        event.preventDefault();
+        if (!loaded || saving || !$('js-form').reportValidity()) return;
+        setBusy(true);
+        const values = fields.map(([path, id]) => [path, $(id).type === 'checkbox' ? $(id).checked
+            : $(id).type === 'number' ? Number($(id).value) : $(id).value.trim()]);
+        const priority = prioritySelects.map(select => select.value);
+        const selections = structuredClone(scopes);
+        status($('js-enabled').checked ? 'Saving settings and removing blacklisted segments…' : 'Disabling JumpSkip and removing its segments…');
+        try {
+            // Read the full config again so hidden settings and provider credentials are preserved.
+            const config = await api('GET', 'JumpSkip/Settings');
+            for (const [path, value] of values) write(config, path, value);
+            config.ProviderPriority = priority;
+            for (const [mode, paths] of Object.entries(scopePaths)) {
+                config[paths[0]] = selections[mode].libraries;
+                config[paths[1]] = selections[mode].items;
+            }
+            const result = await api('PUT', 'JumpSkip/Settings', config);
+            status('Saved. ' + (config.Enabled
+                ? 'Segment refresh queued in the background. Follow progress in Dashboard → Scheduled Tasks → JumpSkip segment refresh.'
+                : 'JumpSkip is disabled.' + (result.CleanupFailures ? '' : ' Its segments were removed and original chapters restored. Reopen playback to reload markers.'))
+                + (result.CleanupFailures ? (config.Enabled ? ' Some blacklisted items' : ' Some items') + ' could not be cleaned; the background scan will retry. Check the server log.' : ''));
+        } catch (error) {
+            status(errorText(error));
+        } finally { setBusy(false); }
+    };
+
+    $('js-remove').onclick = async () => {
+        if (!loaded || saving) return;
+        setBusy(true);
+        status('Removing JumpSkip segments…');
+        try {
+            const result = await api('POST', 'JumpSkip/Segments/Remove', { All: true });
+            const failures = (result.Results || []).filter(item => item.Error).length;
+            status('Removed ' + result.TotalSegmentsRemoved + ' segments from ' + result.TotalItems + ' items.'
+                + (failures ? ' ' + failures + ' item(s) failed; press Remove Fetched Segments to retry.' : ''));
+        } catch (error) { status('Segment removal failed. ' + errorText(error)); }
+        finally { setBusy(false); }
+    };
+
+    function closePicker() {
+        clearTimeout(searchTimer); ++browseVersion; picker = null;
+        if ($('js-picker').open) $('js-picker').close();
+    }
+    function toggle(ids, id) {
+        return includes(ids, id) ? ids.filter(value => normalize(value) !== normalize(id)) : [...ids, id];
+    }
+    function renderPicker() {
+        if (!picker) return;
+        const library = picker.library;
+        const selectedLibrary = library && includes(picker.libraries, library.Id);
+        const modeLabel = 'Blacklist';
+        $('js-picker-title').textContent = modeLabel + ' — ' + (library ? library.Name : 'Choose libraries');
+        $('js-picker-back').hidden = !library;
+        $('js-picker-library').hidden = !library;
+        $('js-picker-library').textContent = selectedLibrary ? 'Remove whole library' : modeLabel + ' whole library';
+        $('js-picker-library').setAttribute('aria-pressed', String(!!selectedLibrary));
+        $('js-picker-search-label').textContent = library ? 'Search this library' : 'Search libraries';
+        const query = $('js-picker-search').value.trim().toLowerCase();
+        const items = library ? browseItems : libraries.filter(item => item.Name.toLowerCase().includes(query));
+        const target = $('js-picker-results'); target.replaceChildren();
+        for (const item of items) {
+            const selected = includes(library ? picker.items : picker.libraries, item.Id);
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'js-card';
+            button.setAttribute('aria-pressed', String(selected));
+            button.setAttribute('aria-label', (library ? 'Select ' : 'Open ') + item.Name);
+            if (typeof ApiClient.getScaledImageUrl === 'function') {
+                const image = document.createElement('img');
+                image.alt = ''; image.loading = 'lazy';
+                image.src = ApiClient.getScaledImageUrl(item.Id, { type: 'Primary', width: 200 });
+                image.onerror = () => { image.hidden = true; };
+                button.append(image);
+            }
+            const title = document.createElement('span'); title.textContent = item.Name; button.append(title);
+            const hint = document.createElement('small');
+            hint.textContent = selected ? 'Selected' : selectedLibrary ? 'Included via whole library' : library ? item.Type === 'Series' ? 'Select show' : 'Select movie' : 'Open library';
+            button.append(hint);
+            button.onclick = () => {
+                if (!picker) return;
+                if (library) { picker.items = toggle(picker.items, item.Id); renderPicker(); }
+                else { picker.library = item; $('js-picker-search').value = ''; void loadBrowse(); }
+            };
+            target.append(button);
+        }
+        $('js-picker-more').hidden = !library || browseOffset >= browseTotal;
+        $('js-picker-status').textContent = library
+            ? (items.length ? 'Select shows or movies, or select the whole library.' : 'No shows or movies found.')
+            : (items.length ? 'Open a library to select its contents or the whole library.' : 'No libraries found.');
+    }
+    async function loadBrowse(append = false) {
+        if (!picker) return;
+        clearTimeout(searchTimer);
+        const version = ++browseVersion;
+        const library = picker.library;
+        const query = $('js-picker-search').value.trim();
+        if (!append) { browseItems = []; browseOffset = 0; browseTotal = 0; }
+        renderPicker();
+        $('js-picker-status').textContent = 'Loading…';
+        $('js-picker-more').disabled = true;
+        try {
+            if (!library) {
+                const result = await get(userPath() + '/Views');
+                if (version !== browseVersion || !picker) return;
+                libraries = (result.Items || []).filter(item => !item.CollectionType || ['movies', 'tvshows', 'mixed'].includes(item.CollectionType));
+                remember(libraries);
+            } else {
+                const result = await get(userPath() + '/Items', {
+                    ParentId: library.Id, IncludeItemTypes: 'Series,Movie', Recursive: true,
+                    SortBy: 'SortName', SortOrder: 'Ascending', SearchTerm: query,
+                    StartIndex: browseOffset, Limit: 100, EnableTotalRecordCount: true
+                });
+                if (version !== browseVersion || !picker) return;
+                const items = result.Items || []; remember(items);
+                browseItems = append ? [...browseItems, ...items] : items;
+                browseOffset += items.length;
+                browseTotal = items.length ? result.TotalRecordCount ?? browseOffset : browseOffset;
+            }
+            renderPicker();
+        } catch (error) {
+            if (version === browseVersion && picker) $('js-picker-status').textContent = errorText(error);
+        } finally {
+            if (version === browseVersion) $('js-picker-more').disabled = false;
+        }
+    }
+    for (const mode of Object.keys(scopePaths)) {
+        $('js-' + mode + '-browse').onclick = () => {
+            if (!loaded || saving) return;
+            picker = { mode, ...structuredClone(scopes[mode]), library: null };
+            $('js-picker-search').value = '';
+            $('js-picker').showModal(); void loadBrowse();
+        };
+        $('js-' + mode + '-clear').onclick = () => {
+            if (!loaded || saving) return;
+            scopes[mode] = { libraries: [], items: [] }; renderSummary(mode);
+        };
+    }
+    $('js-picker-search').oninput = () => {
+        clearTimeout(searchTimer);
+        if (!picker) return;
+        if (!picker.library) { renderPicker(); return; }
+        ++browseVersion;
+        browseItems = []; browseOffset = 0; browseTotal = 0; renderPicker();
+        searchTimer = setTimeout(() => void loadBrowse(), 300);
+    };
+    $('js-picker-back').onclick = () => {
+        if (!picker) return;
+        picker.library = null; $('js-picker-search').value = ''; void loadBrowse();
+    };
+    $('js-picker-library').onclick = () => {
+        if (!picker?.library) return;
+        picker.libraries = toggle(picker.libraries, picker.library.Id); renderPicker();
+    };
+    $('js-picker-more').onclick = () => void loadBrowse(true);
+    $('js-picker-apply').onclick = () => {
+        if (!picker) return;
+        scopes[picker.mode] = { libraries: [...picker.libraries], items: [...picker.items] };
+        renderSummary(picker.mode); closePicker();
+    };
+    $('js-picker-cancel').onclick = closePicker;
+    $('js-picker').addEventListener('cancel', event => { event.preventDefault(); closePicker(); });
+})();
+</script>
+</div>
+</body>
+</html>

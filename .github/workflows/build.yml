@@ -1,0 +1,74 @@
+name: Build and release plugin
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Package and release JumpSkip
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: src/JumpSkip/packages.lock.json
+
+      - name: Build install ZIP
+        run: ./build.ps1
+
+      - name: Upload install ZIP
+        uses: actions/upload-artifact@v7
+        with:
+          path: artifacts/JumpSkip_*_jellyfin-*.zip
+          archive: false
+          if-no-files-found: error
+
+      - name: Publish versioned GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $metadata = Get-Content -LiteralPath meta.json -Raw | ConvertFrom-Json
+          $version = $metadata.version
+          if ($version -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+            throw 'The plugin version must have four numeric parts'
+          }
+          $tag = 'v' + $version
+          $targetAbi = [version]$metadata.targetAbi
+          $package = 'artifacts/JumpSkip_' + $version + '_jellyfin-' + $targetAbi.Major + '.' + $targetAbi.Minor + '.zip'
+
+          $existingRelease = gh release view $tag --json url --jq .url 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            "Release $tag already exists: $existingRelease." |
+              Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY
+            return
+          }
+
+          $tagCommit = git rev-parse --verify --quiet "refs/tags/${tag}^{commit}"
+          if ($LASTEXITCODE -eq 0 -and $tagCommit -ne $env:GITHUB_SHA) {
+            throw "Tag $tag points to another commit."
+          }
+
+          $notesFile = Join-Path $env:RUNNER_TEMP 'jumpskip-release-notes.md'
+          Set-Content -LiteralPath $notesFile -Value $metadata.changelog -Encoding utf8
+          gh release create $tag $package --target $env:GITHUB_SHA --title "JumpSkip $version" --notes-file $notesFile
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release creation failed.' }
+          "Published $tag with the install ZIP containing JumpSkip.dll, meta.json and icon.svg." |
+            Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY

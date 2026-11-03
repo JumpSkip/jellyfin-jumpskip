@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="jumpskip-title jumpskip-description">
+  <title id="jumpskip-title">JumpSkip</title>
+  <desc id="jumpskip-description">A bold J and a forward-skip chevron in lime on charcoal.</desc>
+  <rect width="512" height="512" fill="#11151b"/>
+  <g fill="#c6f45a" transform="translate(6 -15)">
+    <path d="M146 144H280V306C280 362 241 398 182 398C123 398 84 362 84 306V278H152V304C152 324 162 336 182 336C202 336 212 324 212 304V212H146Z"/>
+    <path d="M308 191L416 271L308 351V295L344 271L308 247Z"/>
+  </g>
+</svg>

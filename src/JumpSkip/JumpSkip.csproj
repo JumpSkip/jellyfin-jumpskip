@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ReleaseMetadataPath>$(MSBuildProjectDirectory)/../../meta.json</ReleaseMetadataPath>
+    <ReleaseVersion>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(ReleaseMetadataPath)')), '"version"\s*:\s*"(?&lt;version&gt;[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"').Groups.get_Item('version').Value)</ReleaseVersion>
+    <Version>$(ReleaseVersion)</Version>
+    <AssemblyVersion>$(ReleaseVersion)</AssemblyVersion>
+    <FileVersion>$(ReleaseVersion)</FileVersion>
+    <AssemblyName>JumpSkip</AssemblyName>
+    <RootNamespace>JumpSkip</RootNamespace>
+    <PackageId>JumpSkip</PackageId>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <Deterministic>true</Deterministic>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Jellyfin.Controller" Version="12.4.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Model" Version="12.4.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Database.Implementations" Version="12.4.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration/settings.html" />
+    <EmbeddedResource Include="$(ReleaseMetadataPath)" LogicalName="JumpSkip.release.json" />
+  </ItemGroup>
+  <Import Project="../../build/PluginMetadata.targets" />
+</Project>
