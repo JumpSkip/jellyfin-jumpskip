@@ -15,6 +15,10 @@ JumpSkip Detects and skips media segments (intros, recaps, outros/credits, and p
 > 
 > **None / Ask To Skip / Skip**
 
+> [!TIP]
+> For **`Jellyfin MPV Shim`** checkout [mpv-jumpskip](https://github.com/JumpSkip/mpv-jumpskip)
+
+
 ## Install and configure
 ### **Automatic updates**:
 
